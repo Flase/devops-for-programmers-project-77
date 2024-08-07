@@ -118,14 +118,14 @@ resource "openstack_lb_pool_v2" "pool" {
 }
 
 resource "openstack_lb_member_v2" "members" {
-  count         = var.vm_count
-  name          = format("%s-member-%d", var.base_name, count.index + 1)
-  subnet_id     = var.radozhickij_subnet_id
-  pool_id       = openstack_lb_pool_v2.pool.id
-#  address       = openstack_networking_floatingip_v2.floatingips[count.index].fixed_ip
+  count     = var.vm_count
+  name      = format("%s-member-%d", var.base_name, count.index + 1)
+  subnet_id = var.radozhickij_subnet_id
+  pool_id   = openstack_lb_pool_v2.pool.id
+  #  address       = openstack_networking_floatingip_v2.floatingips[count.index].fixed_ip
   address       = openstack_networking_port_v2.ports[count.index].all_fixed_ips[0]
   protocol_port = "80"
-  depends_on    = [
+  depends_on = [
     openstack_compute_instance_v2.servers,
     openstack_lb_pool_v2.pool,
     openstack_lb_listener_v2.listener,
@@ -144,7 +144,7 @@ resource "openstack_lb_monitor_v2" "monitor_1" {
   delay       = "10"
   timeout     = "4"
   max_retries = "5"
-  depends_on = [openstack_lb_member_v2.members]
+  depends_on  = [openstack_lb_member_v2.members]
 }
 
 
@@ -167,17 +167,17 @@ data "selectel_dbaas_flavor_v1" "flavor_1" {
     vcpus             = 4
     ram               = 16384
     disk              = 128
-    }
   }
+}
 
 resource "selectel_dbaas_postgresql_datastore_v1" "datastore_1" {
-  name       = "datastore-1"
-  project_id = var.selectel_radozhickij_uuid
-  region     = "ru-9"
-  type_id    = data.selectel_dbaas_datastore_type_v1.datastore_type_1.datastore_types[0].id
-  subnet_id  = var.radozhickij_subnet_id
-  node_count = 2
-  flavor_id  = data.selectel_dbaas_flavor_v1.flavor_1.flavors[0].id
+  name                  = "datastore-1"
+  project_id            = var.selectel_radozhickij_uuid
+  region                = "ru-9"
+  type_id               = data.selectel_dbaas_datastore_type_v1.datastore_type_1.datastore_types[0].id
+  subnet_id             = var.radozhickij_subnet_id
+  node_count            = 2
+  flavor_id             = data.selectel_dbaas_flavor_v1.flavor_1.flavors[0].id
   backup_retention_days = 7
   pooler {
     mode = "transaction"

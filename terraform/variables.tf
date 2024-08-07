@@ -55,5 +55,5 @@ variable "radozhickij_subnet_id" {
 
 variable "app_db_password_vault" {
   description = "db password"
-  type = string
+  type        = string
 }
