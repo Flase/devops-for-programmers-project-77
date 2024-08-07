@@ -1,0 +1,98 @@
+---
+- name: Run Terraform with secrets from Ansible Vault on localhost
+  hosts: localhost
+  gather_facts: no
+  vars_files:
+    - group_vars/localhost/vault.yml
+  tasks:
+    - name: Initialize Terraform with backend configuration
+      command: >
+        terraform init
+        -backend-config="access_key={{ terraform.s3_access_key }}"
+        -backend-config="secret_key={{ terraform.s3_secret_key }}"
+        -backend-config="bucket={{ terraform.s3_bucket }}"
+      args:
+        chdir: "{{ playbook_dir }}/../terraform"
+      tags: [tf_init]
+
+    - name: Set terraform vars
+      template:
+        src: templates/secret.auto.tfvars.j2
+        dest: ./../terraform/secrets.auto.tfvars.example
+      tags: [tf_vars]
+
+- name: Docker install
+  hosts: tf-servers
+  become: true
+  roles:
+    - role: geerlingguy.pip
+
+  tasks:
+    - name: Update apt cache
+      apt:
+        update_cache: yes
+      tags: [setup]
+
+    - name: Install dependencies
+      apt:
+        name: "{{ item }}"
+        state: present
+        update_cache: yes
+      loop:
+        - apt-transport-https
+        - ca-certificates
+        - curl
+        - gnupg-agent
+        - software-properties-common
+      tags: [setup]
+
+    - name: Add GPG key
+      apt_key:
+        url: https://download.docker.com/linux/ubuntu/gpg
+        state: present
+      tags: [setup]
+
+    - name: Add Docker repository to apt
+      apt_repository:
+        repo: deb [arch=amd64] https://download.docker.com/linux/ubuntu bionic stable
+        state: present
+        update_cache: yes
+      tags: [setup]
+
+    - name: Install Docker
+      apt:
+        name: "{{ item }}"
+        state: present
+      loop:
+        - docker-ce
+        - docker-ce-cli
+        - containerd.io
+      tags: [setup]
+
+- hosts: tf-servers
+  tasks:
+    - name: Install Python requests module
+      apt:
+          name: python3-requests
+          state: present
+      tags: [deploy]
+
+    - community.docker.docker_container:
+        name: app
+        image: redmine
+        restart_policy: always
+        state: started
+        ports:
+          - 0.0.0.0:80:3000
+        env:
+          REDMINE_DB_POSTGRES: "{{ app_db_postgres }}"
+          REDMINE_DB_DATABASE: "{{ app_db_database }}"
+          REDMINE_DB_USERNAME: "{{ app_db_username }}"
+          REDMINE_DB_PASSWORD: "{{ app_db_password }}"
+      tags: [deploy]
+
+    - name: Stop and remove the Docker container
+      community.docker.docker_container:
+          name: app
+          state: absent
+      tags: [remove]

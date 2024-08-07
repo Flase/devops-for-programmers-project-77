@@ -1,0 +1,12 @@
+---
+roles:
+  - src: geerlingguy.pip
+    version: 3.0.3
+  - src: geerlingguy.git
+    version: 3.0.1
+  - src: datadog.datadog
+    version: 4.24.0
+
+collections:
+  - name: community.docker
+

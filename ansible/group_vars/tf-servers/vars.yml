@@ -1,0 +1,21 @@
+app_db_postgres: "master.5f09e384-07b4-4b74-b973-4f7ac2666b17.c.dbaas.selcloud.ru"
+app_db_database: "hexlet_db"
+app_db_username: "hexlet"
+app_db_password: "{{ app_db_password_vault }}"
+datadog_api_key: "{{ datadog_api_key }}"
+datadog_site: "us5.datadoghq.com"
+
+terraform:
+  selectel_password: "{{terraform.selectel_password}}"
+  selectel_radozhickij_uuid: "{{terraform.selectel_radozhickij_uuid}}"
+  service_user_uid: "{{terraform.service_user_uid}}"
+  radozhickij_network_id: "{{terraform.radozhickij_network_id}}"
+  radozhickij_subnet_id: "{{terraform.radozhickij_subnet_id}}"
+  vm_count: "{{terraform.vm_count}}"
+
+  selectel_domain_name: "{{terraform.selectel_domain_name}}"
+  app_db_password_vault: "{{terraform.app_db_password_vault}}"
+
+  s3_access_key: "{{terraform.s3_access_key}}"
+  s3_secret_key: "{{terraform.s3_secret_key}}"
+  s3_bucket: "{{terraform.s3_bucket}}"

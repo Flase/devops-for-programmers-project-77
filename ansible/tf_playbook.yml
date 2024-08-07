@@ -1,0 +1,16 @@
+---
+- name: Run Terraform with secrets from Ansible Vault on localhost
+  hosts: localhost
+  gather_facts: no
+  vars_files:
+    - group_vars/localhost/vault.yml
+  tasks:
+    - name: Initialize Terraform with backend configuration
+      command: >
+        terraform init
+        -backend-config="access_key={{ terraform.s3_access_key }}"
+        -backend-config="secret_key={{ terraform.s3_secret_key }}"
+        -backend-config="bucket={{ terraform.s3_bucket }}"
+      args:
+        chdir: "{{ playbook_dir }}/../terraform"
+      tags: ["init"]

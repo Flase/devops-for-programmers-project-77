@@ -1,0 +1,9 @@
+/ansible/group_vars/webservers/vault.yml
+/ansible/group_vars/localhost/vault.yml
+/terraform/secrets.auto.tfvars
+/terraform/modules/network/secrets.auto.tfvars
+/terraform/modules/compute/secrets.auto.tfvars
+/terraform/modules/keypair/secrets.auto.tfvars
+/terraform/modules/load_balancer/secrets.auto.tfvars
+/terraform/modules/volumes/secrets.auto.tfvars
+/ansible/group_vars/tf-servers/vault.yml

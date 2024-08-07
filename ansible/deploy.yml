@@ -1,0 +1,34 @@
+---
+- hosts: tf-servers
+  tasks:
+    - name: Install Python requests module
+      apt:
+          name: python3-requests
+          state: present
+      tags: [deploy]
+
+    - community.docker.docker_container:
+        name: app
+        image: redmine
+        restart_policy: always
+        state: started
+        ports:
+          - 0.0.0.0:80:3000
+        env:
+          REDMINE_DB_POSTGRES: "{{ app_db_postgres }}"
+          REDMINE_DB_DATABASE: "{{ app_db_database }}"
+          REDMINE_DB_USERNAME: "{{ app_db_username }}"
+          REDMINE_DB_PASSWORD: "{{ app_db_password }}"
+#        env_file: /var/tmp/docker/db.env
+      tags: [deploy]
+
+    - name: Stop and remove the Docker container
+      community.docker.docker_container:
+          name: app
+          state: absent
+      tags: [remove]
+#
+#    - name: Import the Datadog Agent role from the Datadog collection
+##      hosts: tf-servers
+#      import_role:
+#          name: datadog.dd.agent
